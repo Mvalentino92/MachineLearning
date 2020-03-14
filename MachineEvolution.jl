@@ -58,7 +58,7 @@ function createhabitat(df::DataFrame,classifyby::String,evolutionrate::Real=1)
         end
 
         # Create species (Default values for evolutionhistory and similarity)
-        species[i] = Species(classes[i],population,[],Inf,false)
+        species[i] = Species(string(classes[i]),population,[],Inf,false)
     end
 
     # Create and return Habitat
