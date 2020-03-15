@@ -16,7 +16,6 @@ mutable struct Species
     name::String
     population::Vector{Organism}
     subpopulation::Vector{Organism}
-    evolutionhistory::Vector
     turns::Real
     converged::Bool
 end
@@ -28,7 +27,6 @@ end
 # submax: Max size of sub population regardless of desired percentage
 mutable struct Habitat
     species::Vector{Species}
-    predictions::Vector
     subsize::Real
     submax::Int
     evolutionrate::Real
@@ -65,11 +63,11 @@ function createhabitat(df::DataFrame,classifyby::String,evolutionrate::Real,
         end
 
         # Create species (Default values for evolutionhistory and similarity)
-	species[i] = Species(string(classes[i]),population,[],[],Inf,false)
+	species[i] = Species(string(classes[i]),population,[],Inf,false)
     end
 
     # Create and return Habitat
-    habitat = Habitat(species,[],subsize,submax,evolutionrate)
+    habitat = Habitat(species,subsize,submax,evolutionrate)
     return habitat
 end
 
@@ -150,6 +148,21 @@ function prepspecies(habitat::Habitat,target::Vector,numspecies::Int,numfeatures
         end
 end
 
+# Gets naive predictions
+function getnaive(species::Vector,targets::Matrix)
+    scores = zeros(length(species))
+    m,n = size(targets)
+    predictions = Vector{String}(undef,m)
+    for i = 1:m
+        target = targets[i,:]
+        for j = 1:length(species)
+            scores[j] = sqrt(sum(map(x -> sum((x.features .- target).^2)/n,species[j].population)))
+        end
+        predictions[i] = species[findmin(scores)[2]].name
+    end
+    return predictions
+end
+
 # The main evolution function
 # df: DataFrame with all instances and features/labels
 # classifyby: The class to predict and classify by
@@ -180,6 +193,9 @@ function EA(df::DataFrame,classifyby::String;
 
     # Predictions
     predictions = Vector{String}(undef,length(testlabels))
+
+    # Get naive predictions!
+    naive = getnaive(habitat.species,testfeatures)
 
     # For every instace in the test data
     for row = 1:size(testfeatures)[1]
@@ -233,5 +249,5 @@ function EA(df::DataFrame,classifyby::String;
     end
 
     # Returns predictions and labels
-    return testlabels,predictions
+    return testlabels,predictions,naive
 end
