@@ -8,3 +8,8 @@ Convergence should be changed to sum(sqrt(every_fitness))/species_size
 ** sqrt might be too expensive. Rethink this. Will implement for now. 
 
 In general, pick an appropiate convergence test
+
+Actually, take out all square roots. 
+Make the fitness the MSE of the features. 
+Then the convergence the sum, divided by species size. 
+
