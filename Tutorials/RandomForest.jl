@@ -31,7 +31,7 @@ train_features,test_features,train_labels,test_labels = train_test_split(feature
 # Construct random forest
 rf = RandomForestRegressor(n_estimators=100,n_jobs=-1)
 
-ScikitLearn.fit!(rf,test_features,test_labels)
+ScikitLearn.fit!(rf,train_features,train_labels)
 
 predictions = predict(rf,test_features)
 
