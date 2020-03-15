@@ -120,7 +120,7 @@ end
 
 # Check for convergence
 function hasconverged(species::Species,tol::Real)
-    val = sum(map(x -> sqrt(x.fitness),species.subpopulation))/length(species.subpopulation)
+    val = sum(map(x -> x.fitness,species.subpopulation))/length(species.subpopulation)
     return val < tol
 end
 
@@ -156,7 +156,7 @@ function getnaive(species::Vector,targets::Matrix)
     for i = 1:m
         target = targets[i,:]
         for j = 1:length(species)
-            scores[j] = sum(map(x -> sqrt(sum((x.features .- target).^2)/n),species[j].population))/length(species[j].population)
+            scores[j] = sum(map(x -> sum((x.features .- target).^2)/n,species[j].population))/length(species[j].population)
         end
         predictions[i] = species[findmin(scores)[2]].name
     end
