@@ -120,7 +120,7 @@ end
 
 # Check for convergence
 function hasconverged(species::Species,tol::Real)
-    val = sqrt(sum(map(x -> x.fitness,species.subpopulation)))
+    val = sum(map(x -> sqrt(x.fitness),species.subpopulation))/length(species.subpopulation)
     return val < tol
 end
 
@@ -137,7 +137,7 @@ function prepspecies(habitat::Habitat,target::Vector,numspecies::Int,numfeatures
 	    # Create subpopulation
 	    subdesired = trunc(Int64,habitat.subsize*length(habitat.species[ids].population))
 	    subsize = subdesired < habitat.submax ? subdesired : habitat.submax
-	    subindices = sample(1:length(habitat.species[ids].population),subsize,replace=true)
+	    subindices = StatsBase.sample(1:length(habitat.species[ids].population),subsize,replace=true)
 	    habitat.species[ids].subpopulation = habitat.species[ids].population[subindices]
 
 	    # Calculate fitness for subpopulation
@@ -156,7 +156,7 @@ function getnaive(species::Vector,targets::Matrix)
     for i = 1:m
         target = targets[i,:]
         for j = 1:length(species)
-            scores[j] = sqrt(sum(map(x -> sum((x.features .- target).^2)/n,species[j].population)))
+            scores[j] = sum(map(x -> sqrt(sum((x.features .- target).^2)/n),species[j].population))/length(species[j].population)
         end
         predictions[i] = species[findmin(scores)[2]].name
     end
