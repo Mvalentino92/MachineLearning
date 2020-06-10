@@ -1,0 +1,112 @@
+SELECT
+	t.identifier AS 'Type Name',
+	COUNT(*) AS 'Pokemon With This Type',
+	total_stats.TotalStats AS 'Total Stats',
+	total_stats.AverageStats AS 'Average Stats',
+	move_metrics.MoveEfficacy AS 'Move Efficacy',
+	total_moves.TotalMoves AS 'Total Moves',
+	move_effects.MovesWithEffect AS 'Moves With Effect'
+FROM
+	types AS t
+JOIN 
+	pokemon AS p
+ON 
+	ps.id == p.species_id
+JOIN 
+	pokemon_types AS pt
+ON
+	p.id = pt.pokemon_id
+JOIN
+	pokemon_species AS ps
+ON
+	pt.type_id = t.id
+LEFT OUTER JOIN
+	(SELECT
+		t.identifier AS 'Type',
+		SUM(pstats.base_stat) AS 'TotalStats',
+		AVG(pstats.base_stat)*6 AS 'AverageStats'
+	FROM
+		pokemon_species AS pspecies
+	JOIN
+		pokemon AS pkmon
+	ON
+		pspecies.id = pkmon.species_id
+	JOIN
+		pokemon_stats AS pstats
+	ON
+		pkmon.id = pstats.pokemon_id
+	JOIN
+		pokemon_types as pt
+	ON
+		pkmon.id = pt.pokemon_id
+	JOIN
+		types AS t
+	ON
+		pt.type_id = t.id
+	GROUP BY
+		t.identifier) AS total_stats
+ON
+	total_stats.Type = t.identifier
+LEFT OUTER JOIN 
+	(SELECT
+		t.identifier AS 'Type',
+		AVG(m.power*m.accuracy) AS 'MoveEfficacy'
+	FROM
+		moves AS m
+	JOIN 
+		move_damage_classes AS mdc
+	ON 
+		m.damage_class_id = mdc.id
+	JOIN
+		types AS t
+	ON
+		m.type_id = t.id
+	WHERE 
+		mdc.id > 1
+	GROUP BY
+		t.identifier) AS move_metrics
+ON
+	move_metrics.Type = t.identifier
+LEFT OUTER JOIN
+	(SELECT
+		t.identifier AS 'Type',
+		COUNT(*) AS 'MovesWithEffect'
+	FROM
+		moves AS m
+	JOIN
+		move_meta AS ma
+	ON
+		m.id = ma.move_id
+	JOIN
+		move_meta_ailments AS mma
+	ON
+		ma.meta_ailment_id = mma.id
+	JOIN
+		types AS t
+	ON
+		m.type_id = t.id
+	WHERE 
+		mma.id > 0
+	GROUP BY
+		t.identifier) AS move_effects
+ON
+	move_effects.Type = t.identifier
+LEFT OUTER JOIN 
+	(SELECT
+		t.identifier AS 'Type',
+		COUNT(*) AS 'TotalMoves'
+	FROM
+		moves AS m
+	JOIN
+		types AS t
+	ON
+		m.type_id = t.id
+	GROUP BY
+		t.identifier) AS total_moves
+ON
+	total_moves.Type = t.identifier
+	
+GROUP BY
+	t.identifier
+ORDER BY
+	[Move Efficacy] DESC
