@@ -1,3 +1,16 @@
+# Reinforcement Learning
+Started with reading Sutton and Bartos Intro book while following David Silvers class. Onto more book and resources!
+
+**GPI_NN.py:** Implemented a General Policy Iteration using 2 Neural Networks. One representing the Policy, and the other representing the Action Value Function. Adapted another gradient descent step for nudging towards improved actions during the training of the Policy Network. Works for continuous action spaces. 
+
+**MCUpdated_CartPoly.py:** Classic Monte Carlo method for solving the CartPole problem. Broke the states into descrete values, and used a look-up table. 
+
+**PolicyGradient.py:** Vanilla Policy Gradient method (tested on CartPole). Added a custom "biased experience replay" buffer, which stores states that had the highest probablity for their episode. Additionally trains on this set of data every so often. Of course, the probablity for those states may not be the same by the time we are trained on them, then from when we added them to the buffer. So if functions both as a reinforcer for convergence (if they are), and helps to undue catastrophic forgetting (if they aren't).
+
+**PyTorchTraining.ipynb:** Some exercises for getting used to Pytorch, which I use for any Reinforcement Learning projects.
+
+**TD_MountainCar.py:** Implemented TD algorithm. Pretty bare bones, actually no eligiblity traces. Uses discretized state space, and look-up table. Did solve it though! 
+
 # MachineLearning
 Machine Learning class using Google Colab
 
