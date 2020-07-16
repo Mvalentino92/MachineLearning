@@ -1,6 +1,8 @@
 # Reinforcement Learning
 Started with reading Sutton and Bartos Intro book while following David Silvers class. Onto more book and resources!
 
+**DeepQ_RubiksCube.zip:** Contains a few files for attempting to solve a Rubiks Cube with Deep Q learning. More for practice with writing reward functions and implementing the Deep Q-learning algorithm. Never actually solved the cube, but was clearly learning to try and maximize the amount of correct placed spaces. Saw states such as having 2 sides completely done with the others 2 off ect. To actually be able to solve it, I suspect adding some heuristics to guide the agent/cut down state space, and a better suited reward function would be necessary. But again, just for general practice. 
+
 **GPI_NN.py:** Implemented a General Policy Iteration using 2 Neural Networks. One representing the Policy, and the other representing the Action Value Function. Adapted another gradient descent step for nudging towards improved actions during the training of the Policy Network. Works for continuous action spaces. 
 
 **MCUpdated_CartPoly.py:** Classic Monte Carlo method for solving the CartPole problem. Broke the states into descrete values, and used a look-up table. 
