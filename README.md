@@ -34,3 +34,10 @@ Link: https://www.kaggle.com/c/house-prices-advanced-regression-techniques/overv
 **InitialAttempt.ipynb:** First attempt at cleaning data and implementing Machine Learning algorithms. I experimented with the following estimators: Linear, Polynomial, and Ridge Regression. Random Forest and Gradient Boosting. Neural Networks.
 
 **SecondAttempt.ipynb:** Second attempt. The data cleaning process was improved, through learned use of Imputer's and Scalers. Use Scipy optimizers to attempt and find optimal parameters for the Neural Network (Neurons per layer, activation function combination ect). Overall these two attempts at Machine Learning for the first time were extremely informative.
+
+## Unscrambler
+### Computer Vision application for unscrambling an image shuffled by 2x2 blocks (the 4 corners)
+
+**ScrambledPets.ipynb:** Originally training and processing the dataset. I used the Oxford-IIIT Pets Dataset, which contains images of cats and dogs. Fastai, a high level deep learning library for Python was used as well. My approach was to train the model (resnet34, pretrained) on scrambled images, where the label could be mapped to a permutation key for how to unscramble it. 
+
+**ProjectDemo.ipynb:** Demonstrates the proficiency of the above model on 3 exclusive test sets. Dogs, Cats, and Miscellaneous which has random animals the model was not trained on. It achieves an average accuracy of about 95 across all sets. 
