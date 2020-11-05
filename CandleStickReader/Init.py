@@ -103,7 +103,7 @@ def nnreduct(*vecs):
 #      3) Range to plot successful training ranges for
 #      4) How long to the streak should be. Days in a row it goes up (both decreasing and increasing)
 #      5) How much increase the stock had, percent wise
-def seek_train(symbol,dayrange,plotrange,i_streak,d_streak,percent_increase):
+def seek_train(symbol,dayrange,plotrange,i_streak,d_streak,percent_increase,falseratio):
 
     # Fetch the data for this symbol
     data = get_aggs(symbol,days=dayrange)
@@ -199,35 +199,43 @@ def seek_train(symbol,dayrange,plotrange,i_streak,d_streak,percent_increase):
     # Plots for, labelled by first character. 1 for buy, 0 for not buy
     for n,idx in enumerate(d_start):
 
-        # First do the not buy, keep rolling random index until it's not within range of anything in d_start
-        # After 5 tries if it's not done, just stop
-        tries = 0
-        idr = idx
-        while tries < 5 and np.any(d_streak+i_streak >= np.abs(idr-d_start)):
-            idr = np.random.randint(plotrange,len(data))
-            tries += 1
-
-        # If we didn't stop cause failing tries, then make the plot
-        if tries < 5:
-
-            # Grab the values to use from the dataframe for plots
-            df_sub = df.iloc[idr:idr-plotrange:-1][::-1]
-
-            # Shoudn't happen, but leave for safety
-            if len(df_sub) == plotrange:
-                destination = 'TrainValid/' if np.random.rand() > 0.2 else 'Test/'
-                mpf.plot(df_sub,type='candle',style=s,savefig=destination + '0'  + symbol + str(n) + '.png')
-
-        # Same as before, but for the buy labelli88ng
+        # Same as before, but for the buy labelling
         df_sub = df.iloc[idx:idx-plotrange:-1][::-1]
 
-        # Only plot if we grabbed everything
-        if len(df_sub) == plotrange:
+        # Get if we hit a true or not
+        hit_true = len(df_sub) == plotrange
+
+        # Only plot if we grabbed everything, and go on to get falses
+        if hit_true:
+
+            # Plot the current true
             destination = 'TrainValid/' if np.random.rand() > 0.2 else 'Test/'
             mpf.plot(df_sub,type='candle',style=s,savefig=destination + '1' + symbol + str(n) + '.png')
 
+            # Plot falses for false ration, give up plotting if can't find a random index quickly
+            hits = []
+            for m in range(falseratio):
+                tries = 0
+                idr = idx
+                while tries < 10 and (np.any(d_streak+i_streak >= np.abs(idr-d_start)) or idr in hits):
+                    idr = np.random.randint(plotrange,len(data))
+                    tries += 1
+
+                # If we didn't stop cause failing tries, then make the plot
+                if tries < 10:
+
+                    # Grab the values to use from the dataframe for plots
+                    df_sub = df.iloc[idr:idr-plotrange:-1][::-1]
+
+                    # Shoudn't happen, but leave for safety
+                    if len(df_sub) == plotrange:
+                        hits.append(idr)
+                        destination = 'TrainValid/' if np.random.rand() > 0.2 else 'Test/'
+                        mpf.plot(df_sub,type='candle',style=s,savefig=destination + '0'  + symbol + str(n*m + m) + '.png')
+
 # Function for generating plots
-def gen_images(num_symbols,dayrange=3000,plotrange=45,i_streak=6,d_streak=4,percent_increase=0.05):
+def gen_images(num_symbols,dayrange=3000,plotrange=45,i_streak=6,d_streak=4,percent_increase=0.05,
+               falseratio=1):
 
     # Get assets, filter, and run
     assets = api.list_assets()
@@ -235,7 +243,7 @@ def gen_images(num_symbols,dayrange=3000,plotrange=45,i_streak=6,d_streak=4,perc
     syms = random.sample(symbols,np.minimum(num_symbols,len(symbols)))
     for sym in syms:
         try:
-            seek_train(sym,dayrange,plotrange,i_streak,d_streak,percent_increase)
+            seek_train(sym,dayrange,plotrange,i_streak,d_streak,percent_increase,falseratio)
         except Exception:
             continue
 
