@@ -19,8 +19,8 @@ from PIL import Image
 
 # API keys
 APCA_API_BASE_URL='https://api.alpaca.markets'
-APCA_API_KEY_ID='MyKey'
-APCA_API_SECRET_KEY='MySecretKey'
+APCA_API_KEY_ID='AKLAN58YF9FZJORV1KHW'
+APCA_API_SECRET_KEY='XMjBmk5gZD9UIdtk88vceIWiNkkvxI0oymdOCijZ'
 
 # Init apis
 api = tradeapi.REST(APCA_API_KEY_ID,APCA_API_SECRET_KEY,APCA_API_BASE_URL,'v2')
@@ -194,7 +194,7 @@ def seek_train(symbol,dayrange,plotrange,i_streak,d_streak,percent_increase):
         "ytick.color": "none",
     }
     mc =  mpf.make_marketcolors(up='g',down='r',inherit=True)
-    s = mpf.make_mpf_style(marketcolors=mc,gridstyle='',rc=rc)
+    s = mpf.make_mpf_style(marketcolors=mc,gridstyle='',rc=rc,facecolor='black')
 
     # Plots for, labelled by first character. 1 for buy, 0 for not buy
     for n,idx in enumerate(d_start):
@@ -215,22 +215,42 @@ def seek_train(symbol,dayrange,plotrange,i_streak,d_streak,percent_increase):
 
             # Shoudn't happen, but leave for safety
             if len(df_sub) == plotrange:
-                mpf.plot(df_sub,type='candle',style=s,savefig='UncroppedImages/0' + symbol + str(n) + '.png')
+                destination = 'TrainValid/' if np.random.rand() > 0.2 else 'Test/'
+                mpf.plot(df_sub,type='candle',style=s,savefig=destination + '0'  + symbol + str(n) + '.png')
 
         # Same as before, but for the buy labelli88ng
         df_sub = df.iloc[idx:idx-plotrange:-1][::-1]
 
         # Only plot if we grabbed everything
         if len(df_sub) == plotrange:
-            mpf.plot(df_sub,type='candle',style=s,savefig='UncroppedImages/1' + symbol + str(n) + '.png')
+            destination = 'TrainValid/' if np.random.rand() > 0.2 else 'Test/'
+            mpf.plot(df_sub,type='candle',style=s,savefig=destination + '1' + symbol + str(n) + '.png')
 
 # Function for generating plots
-def gen_images(num_symbols,dayrange=1000,plotrange=45,i_streak=6,d_streak=4,percent_increase=0.05):
+def gen_images(num_symbols,dayrange=3000,plotrange=45,i_streak=6,d_streak=4,percent_increase=0.05):
 
     # Get assets, filter, and run
     assets = api.list_assets()
-    symbols = [asset.symbol for asset in assets if asset.tradable and asset.exchange == 'NASDAQ' and asset.status == 'active']
+    symbols = [asset.symbol for asset in assets if asset.tradable and asset.status == 'active']
     syms = random.sample(symbols,np.minimum(num_symbols,len(symbols)))
     for sym in syms:
-        seek_train(sym,dayrange,plotrange,i_streak,d_streak,percent_increase)
+        try:
+            seek_train(sym,dayrange,plotrange,i_streak,d_streak,percent_increase)
+        except Exception:
+            continue
+
+# Function for cropping all images to new bounding box in specified folder
+def crop_images(directory,crop_dims):
+
+    # Get absolute path of directory
+    path = os.path.abspath(directory)
+
+    # Get all files in directory
+    files = os.listdir(path)
+
+    # Iterate all files and crop to new dimension, and change from RGBA if it's not
+    for _file in files:
+        filepath = path + '/' + _file
+        img = Image.open(filepath).convert('RGB').crop(crop_dims)
+        img.save(filepath)
 
