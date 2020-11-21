@@ -24,7 +24,6 @@ def blurr(img,stride=2):
         mult2[row,s:s+stride] = 1
         s += 1
 
-    # Go through all channels, run filter (matrix mult), transpose and divide by elements of filter
-    img_np = np.array([np.dot(c2,mult2.T) for c2 in
-                      [np.dot(mult1,c1) for c1 in img_np]]).T*1/stride**2
+    # Run filter (matrix mult), transpose and divide by elements of filter
+    img_np = np.matmul(np.matmul(mult1,img_np),mult2.T).T*1/stride**2
     return Image.fromarray(img_np.astype(np.uint8))
