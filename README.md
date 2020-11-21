@@ -18,6 +18,8 @@ Started with reading Sutton and Bartos Intro book while following David Silvers 
 # MachineLearning
 Machine Learning class using Google Colab
 
+**BlurrImage.py:** Passes an NxN mean filter over the image to blurr it. Uses 2 passes of matrix multiplication to do so.
+
 **Ensemble.jl:** Applies Evolutionary Algorithms to the task of classification in Machine Learning. Keeps a population of each class in the data, and iteratively evolves each population towards the target data to be classified. Has no formal training phase, instead requiring the algorithm to run for each new classification. Whichever population evolves and converges to the targets attributes/features fastest, is considered to have been the most similar and therefore the proper labeling for this data. Can be done in ensemble, although the slower computation time of this algorithm isn't suitable for large ensembles. May be well suited for smaller data-sets, without a large amount of features. Seems to be relatively robust and insensitive to smaller "training" data. Tested against a naive implementation, which just computes an average "similarity score", between all populations and the target data initially. Using the same formula that the Evolutionary implementation uses for fitness and convergence evaluation. I have only tested on a select few data sets, although my findings indicate that the Evolutionary Algorithm is superior to the naive implementation, and on par with using a RandomForestClassier.  
 
 ## Tutorials (following them to learn!)
